@@ -1,0 +1,22 @@
+# Déploiement simple : un seul service (API + interface + SQLite + sauvegardes).
+#   docker compose up -d --build
+# L'application est alors sur le port 8000 (mettre un reverse proxy HTTPS devant,
+# ou utiliser docker-compose.https.yml qui inclut Caddy avec certificat automatique).
+services:
+  samaimmo:
+    build: .
+    container_name: samaimmo
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      BASE_URL: ${BASE_URL:-http://localhost:8000}
+      OTP_DEV_MODE: ${OTP_DEV_MODE:-true}
+      SMS_PROVIDER: ${SMS_PROVIDER:-console}
+      SMS_HTTP_URL: ${SMS_HTTP_URL:-}
+      SMS_HTTP_KEY: ${SMS_HTTP_KEY:-}
+    volumes:
+      - donnees:/app/data
+
+volumes:
+  donnees:

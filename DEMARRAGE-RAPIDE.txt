@@ -1,0 +1,87 @@
+=========================================================
+SAMAIMMO v1.1 — DÉMARRAGE RAPIDE
+=========================================================
+
+LANCER L'APPLICATION — LINUX / macOS
+  1) Décompresser l'archive (clic droit > Extraire ici,
+     ou dans un terminal :  unzip samaimmo-v1.2.zip )
+  2) Dans un terminal, aller dans le dossier extrait :
+       cd sama-immo
+       bash start.sh
+     (NE LANCEZ PAS start.bat : il est réservé à Windows)
+  3) Au premier lancement : installation automatique
+     (1 à 2 minutes), puis proposition de charger les
+     données de démonstration -> répondre  o
+  4) Ouvrir l'adresse affichée dans le terminal
+     (http://localhost:8000, ou 8001, 8002… si une autre
+     application occupe déjà le port — le script choisit
+     tout seul un port libre et l'affiche).
+
+LANCER L'APPLICATION — WINDOWS
+  Double-cliquer sur start.bat (tout est automatique aussi).
+
+PRÉREQUIS
+  Python 3.10 ou plus récent.   Vérifier :  python3 --version
+  S'il est absent, ou si le message « environnement virtuel
+  impossible » apparaît (fréquent sur Ubuntu/Debian) :
+       sudo apt install python3 python3-venv
+  puis relancer  bash start.sh
+
+SE CONNECTER
+  Ouvrir            : http://localhost:8000 (ou le port affiché)
+  Compte démo       : +221 770 000 000
+  Code de connexion : affiché à l'écran (mode démo, aucun SMS)
+
+  Créer votre vraie agence : entrez simplement VOTRE numéro de
+  téléphone, le code s'affiche, puis le formulaire crée l'agence.
+
+GUIDE COMPLET AVEC SIMULATION
+  Ouvrez GUIDE-UTILISATION.md (dans ce dossier) : il vous fait
+  vivre une journee complete de gerant avec la demo, pas a pas.
+
+À ESSAYER EN 5 MINUTES
+  1. Accueil : encaissé / en attente / en retard du mois
+  2. Encaisser -> choisir un locataire -> Valider
+     -> écran de confirmation + quittance PDF (QR de vérification)
+     -> bouton d'envoi WhatsApp
+  3. Relancer -> liste des retards -> message prêt -> WhatsApp
+  4. Rapports -> rapport propriétaire -> PDF partageable
+  5. Paramètres -> Règles locales (loyer d'avance, jour limite,
+     caution, terme échu du décret 2023-382…)
+
+RÈGLE DE LOYER (v1.1, retour du terrain)
+  Loyer payable D'AVANCE : attendu le 5 du mois, retard après
+  le 10. Premier loyer d'un bail signé après le 5 : dû à la
+  signature. Tout est modifiable : Paramètres -> Règles locales.
+
+TESTS AUTOMATISÉS (32 tests)
+  ./.venv/bin/python -m pytest tests/ -v
+
+SI VOUS NE VOYEZ QUE LE LOGO (page bloquée au démarrage)
+  Cause n°1 : vous avez ouvert le fichier index.html en double-cliquant.
+              -> NON : il faut lancer  bash start.sh  puis ouvrir dans le
+                 navigateur  http://localhost:8000  (le script ouvre le
+                 navigateur tout seul).
+  Cause n°2 : cache du navigateur. -> Appuyez sur  Ctrl+F5  pour recharger.
+  Cause n°3 : navigateur trop ancien. -> Chrome / Firefox récent.
+  La nouvelle version AFFICHE LA CAUSE à l'écran sous le logo.
+  Sinon : touche F12 -> onglet Console -> copiez le message rouge.
+
+SI ÇA BLOQUE — PLAN B (commandes manuelles, tout s'affiche)
+  cd sama-immo
+  python3 -m venv .venv
+  ./.venv/bin/python -m pip install -r requirements.txt
+  ./.venv/bin/python scripts/seed_demo.py
+  ./.venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+  Puis ouvrir http://localhost:8000
+  (si le message « No module named venv » apparaît : sudo apt install python3-venv)
+
+  Le script affiche sa progression [1/7] … [7/7] : s'il s'arrête,
+  notez la dernière ligne affichée — elle dit exactement quoi faire.
+
+REPARTIR DE ZÉRO
+  Arrêter (Ctrl+C), supprimer le dossier data/, relancer.
+
+DÉPLOIEMENT SUR UN SERVEUR (VPS)
+  Voir README.md, section 2 : Docker simple ou HTTPS automatique.
+=========================================================

@@ -1,0 +1,4 @@
+# Remplacer localhost par votre domaine (ex: gestion.mon-agence.sn)
+localhost {
+	reverse_proxy samaimmo:8000
+}

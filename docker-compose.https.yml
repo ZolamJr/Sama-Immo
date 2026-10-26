@@ -1,0 +1,39 @@
+# Déploiement avec HTTPS automatique (Caddy) — recommandé en production.
+#   1) pointer le DNS de votre domaine vers le serveur
+#   2) cp .env.example .env  puis renseigner BASE_URL=https://votre-domaine.sn
+#   3) docker compose -f docker-compose.https.yml up -d --build
+# Caddy obtient et renouvelle le certificat Let's Encrypt automatiquement.
+services:
+  samaimmo:
+    build: .
+    container_name: samaimmo
+    restart: unless-stopped
+    environment:
+      BASE_URL: ${BASE_URL:-https://localhost}
+      OTP_DEV_MODE: ${OTP_DEV_MODE:-true}
+      SMS_PROVIDER: ${SMS_PROVIDER:-console}
+      SMS_HTTP_URL: ${SMS_HTTP_URL:-}
+      SMS_HTTP_KEY: ${SMS_HTTP_KEY:-}
+    volumes:
+      - donnees:/app/data
+    expose:
+      - "8000"
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: samaimmo-https
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - samaimmo
+
+volumes:
+  donnees:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b9fd8">
+<meta name="description" content="SamaImmo — gestion locative simple : biens, locataires, loyers, quittances.">
+<title>SamaImmo — Gestion locative</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div id="app">
+  <div class="splash">
+    <div class="splash-logo">🏠</div>
+    <div class="splash-titre">SamaImmo</div>
+    <div class="splash-sous" id="splash-sous">Chargement…</div>
+  </div>
+</div>
+<div id="toast"></div>
+<div id="modal-fond" class="modal-fond cache"><div id="modal" class="modal"></div></div>
+
+<script>
+/* Diagnostics de démarrage : si l'application ne se lance pas, l'écran
+   explique la cause au lieu de rester sur le logo. */
+(function () {
+  "use strict";
+  var sous = document.getElementById("splash-sous");
+
+  // Cas 1 : page ouverte comme un FICHIER (double-clic sur index.html)
+  // -> les modules JavaScript sont bloqués par le navigateur.
+  if (location.protocol === "file:") {
+    sous.innerHTML = "⚠ Vous avez ouvert le fichier index.html directement.<br><br>" +
+      "Lancez l'application avec <b>bash start.sh</b> (Linux/Mac)<br>" +
+      "ou <b>start.bat</b> (Windows) dans le dossier du projet,<br>" +
+      "puis ouvrez dans le navigateur l'adresse affichée,<br>" +
+      "par exemple <b>http://localhost:8000</b>";
+    throw new Error("page ouverte en file:// — lancez start.sh");
+  }
+
+  // Cas 2 : toute erreur JavaScript au démarrage est affichée à l'écran.
+  window.addEventListener("error", function (e) {
+    if (sous && !sous.getAttribute("data-err")) {
+      sous.setAttribute("data-err", "1");
+      sous.innerHTML = "⚠ Erreur au démarrage : " + (e.message || "inconnue") +
+        "<br><span style='font-size:12px'>1) Rechargez avec <b>Ctrl+F5</b><br>" +
+        "2) Si ça persiste : touche <b>F12</b> → onglet Console →<br>copiez le message rouge et envoyez-le à l'assistance</span>";
+    }
+  });
+})();
+</script>
+<noscript>
+  <div style="text-align:center;padding:24px;font-family:sans-serif">
+    <b>JavaScript est désactivé.</b><br>
+    L'application ne peut pas démarrer : activez JavaScript<br>
+    dans votre navigateur puis rechargez la page.
+  </div>
+</noscript>
+<script nomodule>
+  /* Cas 3 : navigateur trop ancien pour les modules JavaScript modernes */
+  document.getElementById("splash-sous").innerHTML =
+    "⚠ Votre navigateur est trop ancien.<br>Utilisez une version récente de Chrome, Firefox ou Edge.";
+</script>
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>
