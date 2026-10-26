@@ -456,6 +456,8 @@ async def rapports_proprietaires(periode: str | None = None, user: User = Depend
         r = await rapport_proprietaire(db, user.agence_id, p.id, periode)
         out.append({"proprietaire_id": p.id, "nom": p.nom, "encaisse": r["encaisse"],
                     "a_reverser": r["a_reverser"], "commission": r["commission"],
+                    "remuneration_gerant_pct": r["remuneration_gerant_pct"],
+                    "remuneration_gerant": r["remuneration_gerant"],
                     "nb_en_retard": r["nb_en_retard"], "telephone": p.telephone})
     return {"periode": periode, "periode_libelle": periode_libelle(periode), "rapports": out}
 
