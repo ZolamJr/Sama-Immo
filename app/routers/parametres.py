@@ -122,8 +122,9 @@ async def modifier_agence(body: AgenceIn, request: Request, user: User = Depends
     for champ in ("nom", "telephone", "email", "adresse", "remuneration_gerant_pct"):
         v = getattr(body, champ)
         if v is not None:
-            setattr(a, champ, v.strip())
-            modifs[champ] = v
+            valeur = v.strip() if isinstance(v, str) else v
+            setattr(a, champ, valeur)
+            modifs[champ] = valeur
     await log_action(db, user, "agence.modifiee", "agence", a.id, a.nom, modifs, device_id_from(request))
     await db.commit()
     return {"agence": _ser_agence(a)}
