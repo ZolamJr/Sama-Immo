@@ -240,10 +240,12 @@ def generer_rapport_pdf(chemin: str, *, rapport: dict, agence: dict, url_verif: 
     if rapport["biens"]:
         story.append(Spacer(1, 6 * mm))
         story.append(Paragraph("Détail par bien", style["section"]))
-        head = [["Bien", "Unités", "Attendu", "Encaissé", "Reste"]]
-        rows = [[_san(b["immeuble"]), str(b["nb_unites"]), _fmt(b["du"]), _fmt(b["paye"]), _fmt(b["reste"])]
+        style_entete_bien = ParagraphStyle("entete_bien", fontName="Helvetica-Bold", fontSize=8, leading=9, textColor=colors.white)
+        style_nom_bien = ParagraphStyle("nom_bien", fontName="Helvetica", fontSize=8.5, leading=10)
+        head = [[Paragraph(_xml(v), style_entete_bien) for v in ["Bien", "Unités", "Attendu", "Encaissé", "Reste"]]]
+        rows = [[Paragraph(_xml(b["immeuble"]), style_nom_bien), str(b["nb_unites"]), _fmt(b["du"]), _fmt(b["paye"]), _fmt(b["reste"])]
                 for b in rapport["biens"]]
-        t2 = Table(head + rows, colWidths=[55 * mm, 16 * mm, 30 * mm, 30 * mm, 30 * mm])
+        t2 = Table(head + rows, colWidths=[55 * mm, 16 * mm, 30 * mm, 30 * mm, 30 * mm], repeatRows=1)
         t2.setStyle(TableStyle([
             ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
             ("BACKGROUND", (0, 0), (-1, 0), BLEU),
