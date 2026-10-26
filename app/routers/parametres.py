@@ -36,6 +36,7 @@ class AgenceIn(BaseModel):
     telephone: str | None = Field(default=None, max_length=30)
     email: str | None = Field(default=None, max_length=200)
     adresse: str | None = Field(default=None, max_length=300)
+    remuneration_gerant_pct: int | None = Field(default=None, description="Taux contractuel : 10 ou 15 %")
 
 
 class UserIn(BaseModel):
@@ -86,7 +87,7 @@ async def get_regles(db: AsyncSession, agence_id: str) -> Regles:
 def _ser_agence(a: Agence) -> dict:
     return {"id": a.id, "nom": a.nom, "telephone": a.telephone, "email": a.email,
             "adresse": a.adresse, "logo_path": a.logo_path, "tampon_path": a.tampon_path,
-            "signature_path": a.signature_path}
+            "signature_path": a.signature_path, "remuneration_gerant_pct": getattr(a, "remuneration_gerant_pct", 10) or 10}
 
 
 def _ser_regles(r: Regles) -> dict:
@@ -116,11 +117,14 @@ async def modifier_agence(body: AgenceIn, request: Request, user: User = Depends
                           db: AsyncSession = Depends(get_db)):
     a = await get_agence(db, user)
     modifs = {}
-    for champ in ("nom", "telephone", "email", "adresse"):
+    if body.remuneration_gerant_pct is not None and body.remuneration_gerant_pct not in (10, 15):
+        raise HTTPException(422, "La rémunération du gérant doit être de 10 % ou 15 %.")
+    for champ in ("nom", "telephone", "email", "adresse", "remuneration_gerant_pct"):
         v = getattr(body, champ)
         if v is not None:
-            setattr(a, champ, v.strip())
-            modifs[champ] = v
+            valeur = v.strip() if isinstance(v, str) else v
+            setattr(a, champ, valeur)
+            modifs[champ] = valeur
     await log_action(db, user, "agence.modifiee", "agence", a.id, a.nom, modifs, device_id_from(request))
     await db.commit()
     return {"agence": _ser_agence(a)}

@@ -37,6 +37,7 @@ class Agence(Base):
     logo_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
     tampon_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
     signature_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    remuneration_gerant_pct: Mapped[int] = mapped_column(Integer, default=10)  # accord agence-gerant : 10 ou 15 %
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
 

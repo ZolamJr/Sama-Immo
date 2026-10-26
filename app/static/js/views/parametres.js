@@ -20,6 +20,9 @@ export async function rendre() {
       ${champ({ nom: "telephone", label: "Téléphone", type: "tel", valeur: a.telephone })}
       ${champ({ nom: "email", label: "E-mail", type: "email", valeur: a.email, facultatif: true })}
       ${champ({ nom: "adresse", label: "Adresse", valeur: a.adresse, facultatif: true })}
+      ${champ({ nom: "remuneration_gerant_pct", label: "Part mensuelle du gérant (% des loyers encaissés)", valeur: String(a.remuneration_gerant_pct ?? 10), options: [
+        { valeur: "10", libelle: "10 %" }, { valeur: "15", libelle: "15 %" }] })}
+      <div class="aide">Ce taux concerne l’accord entre l’agence et son gérant. Il est indépendant de la commission de l’agence due par chaque propriétaire.</div>
       <button class="btn-ligne petit" type="submit">Enregistrer</button>
     </form>
     <div class="espace"></div>
@@ -62,7 +65,7 @@ export async function apresRendu() {
   const fAgence = document.getElementById("f-agence");
   if (fAgence) fAgence.onsubmit = async (e) => {
     e.preventDefault();
-    try { await patch("/api/agence", Object.fromEntries(new FormData(e.target))); toast("Agence mise à jour ✔", "succes"); }
+    try { const valeurs = Object.fromEntries(new FormData(e.target)); valeurs.remuneration_gerant_pct = parseInt(valeurs.remuneration_gerant_pct, 10); await patch("/api/agence", valeurs); toast("Agence mise à jour ✔", "succes"); }
     catch (err) { toast(err.message, "erreur"); }
   };
   const up = (id, chemin, label) => {
