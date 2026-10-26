@@ -7,7 +7,7 @@ from datetime import date
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .models import Bail, Echeance, Immeuble, Locataire, Paiement, Proprietaire, Regles, Unite
+from .models import Agence, Bail, Echeance, Immeuble, Locataire, Paiement, Proprietaire, Regles, Unite
 
 MOIS_FR = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet",
            "août", "septembre", "octobre", "novembre", "décembre"]
@@ -412,6 +412,9 @@ async def rapport_proprietaire(db: AsyncSession, agence_id: str, proprietaire_id
         b["reste"] += e["reste"]
     encaisse = sum(e["montant_paye"] for e in ech)
     commission = round(encaisse * (prop.commission_pct or 0) / 100)
+    agence = await db.get(Agence, agence_id)
+    remuneration_gerant_pct = int(getattr(agence, "remuneration_gerant_pct", 10) or 10)
+    remuneration_gerant = round(encaisse * remuneration_gerant_pct / 100)
     return {
         "periode": periode,
         "periode_libelle": periode_libelle(periode),
@@ -424,6 +427,8 @@ async def rapport_proprietaire(db: AsyncSession, agence_id: str, proprietaire_id
         "reste_a_encaisser": sum(e["reste"] for e in ech),
         "nb_en_retard": sum(1 for e in ech if e["statut"] == "en_retard"),
         "commission": commission,
+        "remuneration_gerant_pct": remuneration_gerant_pct,
+        "remuneration_gerant": remuneration_gerant,
         "a_reverser": encaisse - commission,
         "biens": list(par_bien.values()),
     }
