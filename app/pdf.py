@@ -223,12 +223,13 @@ def generer_rapport_pdf(chemin: str, *, rapport: dict, agence: dict, url_verif: 
         ["Loyers attendus", f"{_fmt(rapport['du'])} FCFA"],
         ["Reste à encaisser", f"{_fmt(rapport['reste_a_encaisser'])} FCFA"],
         [f"Commission agence ({rapport['proprietaire']['commission_pct']}%)", f"{_fmt(rapport['commission'])} FCFA"],
-        ["Montant à reverser", f"{_fmt(rapport['a_reverser'])} FCFA"],
+        [f"Part du gérant ({rapport.get('remuneration_gerant_pct', 10)} %)", f"{_fmt(rapport.get('remuneration_gerant', 0))} FCFA"],
+        ["Montant à reverser au propriétaire", f"{_fmt(rapport['a_reverser'])} FCFA"],
     ]
     tbl = Table(syn, colWidths=[80 * mm, None])
     tbl.setStyle(TableStyle([
         ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"), ("TEXTCOLOR", (0, 0), (0, -1), BLEU),
-        ("FONTNAME", (1, 4), (1, 4), "Helvetica-Bold"),
+        ("FONTNAME", (1, -1), (1, -1), "Helvetica-Bold"),
         ("FONTSIZE", (0, 0), (-1, -1), 10.5),
         ("ROWBACKGROUNDS", (0, 0), (-1, -1), [colors.white, BLEU_CLAIR]),
         ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#dddddd")),
