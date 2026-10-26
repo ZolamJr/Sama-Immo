@@ -45,6 +45,10 @@ async def init_db() -> None:
         cols_regles = (await conn.execute(text("PRAGMA table_info(regles)"))).fetchall()
         if cols_regles and "jour_limite_paiement" not in {c[1] for c in cols_regles}:
             await conn.execute(text("ALTER TABLE regles ADD COLUMN jour_limite_paiement INTEGER DEFAULT 10"))
+        # Rémunération du gérant : choix par agence, 10 % ou 15 % des loyers encaissés.
+        cols_agence = (await conn.execute(text("PRAGMA table_info(agences)"))).fetchall()
+        if cols_agence and "remuneration_gerant_pct" not in {c[1] for c in cols_agence}:
+            await conn.execute(text("ALTER TABLE agences ADD COLUMN remuneration_gerant_pct INTEGER DEFAULT 10"))
         # v1.2 — mandat de gestion (agence <-> propriétaire)
         cols_prop = (await conn.execute(text("PRAGMA table_info(proprietaires)"))).fetchall()
         if cols_prop:
