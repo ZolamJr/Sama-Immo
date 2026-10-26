@@ -20,7 +20,8 @@ export async function rendre() {
     <div class="libelle">Total encaissé — ${esc(data.periode_libelle)}</div>
     <div style="font-size:1.6rem;font-weight:800" class="montant">${fcfa(rapports.reduce((s, r) => s + r.encaisse, 0))}</div>
     <div class="lignes">
-      <div class="ligne-item"><div class="lib">Commissions</div><div class="val montant">${fcfa(rapports.reduce((s, r) => s + r.commission, 0))}</div></div>
+      <div class="ligne-item"><div class="lib">Commissions agence</div><div class="val montant">${fcfa(rapports.reduce((s, r) => s + r.commission, 0))}</div></div>
+      <div class="ligne-item"><div class="lib">Part du gérant (${rapports[0]?.remuneration_gerant_pct ?? 10} %)</div><div class="val montant">${fcfa(rapports.reduce((s, r) => s + (r.remuneration_gerant || 0), 0))}</div></div>
       <div class="ligne-item"><div class="lib">À reverser</div><div class="val montant">${fcfa(rapports.reduce((s, r) => s + r.a_reverser, 0))}</div></div>
     </div>
   </div>
@@ -57,8 +58,10 @@ async function detail(pid, periode) {
     <div class="ligne-flex"><span>Loyers attendus</span><b class="montant">${fcfa(r.du)}</b></div>
     <div class="ligne-flex"><span>Encaissé</span><b class="montant" style="color:var(--vert)">${fcfa(r.encaisse)}</b></div>
     <div class="ligne-flex"><span>Reste à encaisser</span><b class="montant" style="color:var(--orange)">${fcfa(r.reste_a_encaisser)}</b></div>
-    <div class="ligne-flex"><span>Commission (${r.proprietaire.commission_pct} %)</span><b class="montant">${fcfa(r.commission)}</b></div>
-    <div class="ligne-flex"><b>Montant à reverser</b><b class="montant" style="font-size:1.2rem;color:var(--bleu-fonce)">${fcfa(r.a_reverser)}</b></div>
+    <div class="ligne-flex"><span>Commission agence (${r.proprietaire.commission_pct} %)</span><b class="montant">${fcfa(r.commission)}</b></div>
+    <div class="ligne-flex"><span>Part du gérant (${r.remuneration_gerant_pct ?? 10} %)</span><b class="montant">${fcfa(r.remuneration_gerant || 0)}</b></div>
+    <div class="petit gris">La part du gérant est un accord interne agence–gérant. Elle ne réduit pas le montant dû au propriétaire.</div>
+    <div class="ligne-flex"><b>Montant à reverser au propriétaire</b><b class="montant" style="font-size:1.2rem;color:var(--bleu-fonce)">${fcfa(r.a_reverser)}</b></div>
   </div>
   ${(r.biens || []).length ? `
   <div class="sous-titre">Détail par bien</div>
