@@ -5,6 +5,7 @@ import hashlib
 import io
 from datetime import date
 from pathlib import Path
+from xml.sax.saxutils import escape as xml_escape
 
 import qrcode
 from reportlab.lib import colors
@@ -31,6 +32,11 @@ def _san(s: str) -> str:
     for k, v in remplacements.items():
         s = s.replace(k, v)
     return s.encode("latin-1", "replace").decode("latin-1")
+
+
+def _xml(s: str) -> str:
+    """Échappe les données dynamiques avant insertion dans le balisage ReportLab."""
+    return xml_escape(_san(str(s)))
 
 
 def _fmt(n: int) -> str:
@@ -65,10 +71,10 @@ def _img_si_presente(chemin: str | None, largeur: int = 40 * mm, hauteur_max: in
 def _entete(story, agence: dict):
     logo = _img_si_presente(agence.get("logo_path"), largeur=20 * mm, hauteur_max=20 * mm)
     coords = Paragraph(
-        f"<b>{_san(agence.get('nom', ''))}</b><br/>"
-        f"{_san(agence.get('adresse', ''))}<br/>"
-        f"Tél : {_san(agence.get('telephone', ''))}"
-        + (f"<br/>{_san(agence.get('email', ''))}" if agence.get("email") else ""),
+        f"<b>{_xml(agence.get('nom', ''))}</b><br/>"
+        f"{_xml(agence.get('adresse', ''))}<br/>"
+        f"Tél : {_xml(agence.get('telephone', ''))}"
+        + (f"<br/>{_xml(agence.get('email', ''))}" if agence.get("email") else ""),
         ParagraphStyle("coords", fontName="Helvetica", fontSize=9, textColor=GRIS, leading=12),
     )
     if logo:
@@ -90,7 +96,7 @@ def _pied(story, empreinte: str | None, url_verif: str | None):
     if url_verif:
         lignes.append(f"Vérification en ligne : {_san(url_verif)}")
     story.append(Paragraph(
-        "<br/>".join(_san(x) for x in lignes),
+        "<br/>".join(_xml(x) for x in lignes),
         ParagraphStyle("pied", fontName="Helvetica", fontSize=7, textColor=GRIS, leading=9, alignment=1),
     ))
 
@@ -162,7 +168,7 @@ def generer_recu_pdf(chemin: str, *, recu_type: str, numero: str, url_verif: str
     story.append(Spacer(1, 5 * mm))
     for b in blocs:
         # les blocs peuvent être du texte simple -> Paragraph avec le style corps
-        story.append(Paragraph(b, style["corps"]) if isinstance(b, str) else b)
+        story.append(Paragraph(_xml(b), style["corps"]) if isinstance(b, str) else b)
         story.append(Spacer(1, 3 * mm))
     story.append(Spacer(1, 3 * mm))
     tbl = Table(lignes, colWidths=[65 * mm, None])
@@ -209,7 +215,7 @@ def generer_rapport_pdf(chemin: str, *, rapport: dict, agence: dict, url_verif: 
     _entete(story, agence)
     story.append(Paragraph("RAPPORT DE GESTION", style["titre"]))
     story.append(Paragraph(
-        f"{_san(rapport['periode_libelle'])} — Propriétaire : {_san(rapport['proprietaire']['nom'])}",
+        f"{_xml(rapport['periode_libelle'])} — Propriétaire : {_xml(rapport['proprietaire']['nom'])}",
         style["sous"]))
     story.append(Spacer(1, 5 * mm))
     syn = [
@@ -258,7 +264,11 @@ def generer_rapport_pdf(chemin: str, *, rapport: dict, agence: dict, url_verif: 
 # ================================================================ Documents de gestion (v1.2)
 
 def _table_generale(head: list, rows: list, largeurs: list, aligns_droite: tuple = ()):
-    t = Table([head] + rows, colWidths=largeurs, repeatRows=1)
+    style_entete = ParagraphStyle("table_entete", fontName="Helvetica-Bold", fontSize=8.5, leading=10, textColor=colors.white)
+    style_cellule = ParagraphStyle("table_cellule", fontName="Helvetica", fontSize=8.2, leading=10)
+    head_wrapped = [Paragraph(_xml(v), style_entete) for v in head]
+    rows_wrapped = [[Paragraph(_xml(v), style_cellule) for v in row] for row in rows]
+    t = Table([head_wrapped] + rows_wrapped, colWidths=largeurs, repeatRows=1)
     style = [
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("BACKGROUND", (0, 0), (-1, 0), BLEU),
