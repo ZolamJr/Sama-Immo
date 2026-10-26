@@ -1,0 +1,26 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+
+# Runtime data and generated/private files
+/data/*
+!/data/.gitkeep
+*.db
+*.sqlite
+*.sqlite3
+*.pdf
+/data/files/
+/data/backups/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local virtual environments
+.venv/
+venv/
